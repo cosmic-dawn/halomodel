@@ -3,16 +3,16 @@ SHELL := /bin/bash
 
 # compiler option
 CC      = gcc
-CFLAGS  = -fPIC -Wall -Wextra -O3 #-g
+CFLAGS  = -fPIC -Wall -Wextra -O3 
 LDFLAGS =
 RM      = rm -f
 NAME    = halomodel
 EXT     = so
 
 # required libraries
-PREFIX_FFTW   = # /usr/local
-PREFIX_GSL    = # /usr/local
-PREFIX_NICAEA = # $(HOME)/local/source/build/nicaea_2.7
+PREFIX_FFTW   = /softs/fftw/3.3.8-gnu
+PREFIX_GSL    = /softs/gsl/2.5
+PREFIX_NICAEA = /home/davidzon/.local
 
 ifneq ($(PREFIX_GSL), )
 	GSL = $(PREFIX_GSL)
@@ -40,22 +40,23 @@ endif
 SRCS    = utils.c cosmo.c hod.c abundance.c lensing.c clustering.c xray.c
 OBJS    = $(SRCS:.c=.o)
 
+# xray.c includes Python.h
+PYTHON_HEAD = /opt/intel/intelpython3-2018.3-039/include/python3.6m 
 # extra headers
-CFLAGS += -Iinclude -I$(FFTW)/include  -I$(GSL)/include -I$(NICAEA)/include
+CFLAGS += -Iinclude -I$(FFTW)/include -I$(GSL)/include -I$(NICAEA)/include -I$(PYTHON_HEAD)
 LFLAGS += -lm  -lfftw3 -lgsl -lgslcblas -L$(FFTW)/lib -L$(GSL)/lib -L$(NICAEA)/lib -lnicaea
-
 LDFLAGS += -Wl,-rpath,$(NICAEA)/lib -Wl,-rpath,$(FFTW)/lib -Wl,-rpath,$(GSL)/lib
 
 # if trouble with link to conda python library, run
 # sudo install_name_tool -id /PATH/TO/anaconda/lib/libpythonx.x.dylib /PATH/TO/anaconda/lib/libpythonx.x.dylib
+#PYTHON_LIB = /opt/intel/intelpython3-2018.3-039/include/python3.6m #$(shell which python | sed "s/bin\/python/lib/")
 
-PYTHON_LIB=$(shell which python | sed "s/bin\/python/lib/")
+
 
 # python interpreter
-CFLAGS += $(shell python-config --cflags)
-LFLAGS += $(shell python-config --ldflags) -L$(PYTHON_LIB)
+##CFLAGS += $(shell python-config --cflags)
+##LFLAGS += $(shell python-config --ldflags) -L$(PYTHON_LIB)
 
-# -L/Users/coupon/anaconda/lib
 
 .PHONY: all
 all: ./lib/lib$(NAME).$(EXT)
@@ -63,9 +64,11 @@ all: ./lib/lib$(NAME).$(EXT)
 vpath %.h $(PWD)/include
 vpath %.c $(PWD)/src
 
-xray:  $(OBJS)
-	$(CC)  $(CFLAGS) -o $@ $^ $(LFLAGS) $(LDFLAGS) -L.
-	mv xray ./bin/xray
+##xray:  $(OBJS)
+##	$(CC)  $(CFLAGS) -o $@ $^ $(LFLAGS) $(LDFLAGS) -L. 
+	##$(CC)  $(CFLAGS) -o $@ $^ $(LFLAGS) $(LDFLAGS) -L. -I/opt/intel/intelpython3-2018.3-039/include
+
+##	mv xray ./bin/xray
 
 ./lib/lib$(NAME).$(EXT): $(OBJS)
 	$(CC)  $(CFLAGS) -shared -o $@ $^ $(LFLAGS) $(LDFLAGS) -L.
