@@ -41,7 +41,7 @@ SRCS    = utils.c cosmo.c hod.c abundance.c lensing.c clustering.c xray.c
 OBJS    = $(SRCS:.c=.o)
 
 # xray.c includes Python.h
-PYTHON_HEAD = /opt/intel/intelpython3-2018.3-039/include/python3.6m 
+PYTHON_HEAD = /opt/intel/intelpython2-2018.3-039/include/python2.7
 # extra headers
 CFLAGS += -Iinclude -I$(FFTW)/include -I$(GSL)/include -I$(NICAEA)/include -I$(PYTHON_HEAD)
 LFLAGS += -lm  -lfftw3 -lgsl -lgslcblas -L$(FFTW)/lib -L$(GSL)/lib -L$(NICAEA)/lib -lnicaea
